@@ -1,0 +1,20 @@
+%script{type: 'text/x-handlebars', 'data-template-name' => 'application'}
+  {{outlet}}
+
+%script{type: 'text/x-handlebars', 'data-template-name' => 'index'}
+  %h1 Hello
+  {{#linkTo 'users'}}Users{{/linkTo}}
+
+%script{type: 'text/x-handlebars', 'data-template-name' => 'users'}
+  %h2 All Baltimore Github Users {{controller.length}}
+  %ul.users
+    {{#each controller}}
+    %li 
+      %dl
+        %dt Username
+        %dd.username {{username}}
+        %dt Followers Count
+        %dd.followers_count {{followersCount}}
+        %dt Public Repo Count
+        %dd.public_repo_count {{publicRepoCount}}
+    {{/each}}
