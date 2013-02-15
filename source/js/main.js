@@ -12,6 +12,9 @@ App.UserCollection = Backbone.Collection.extend({
   url: 'https://api.github.com/legacy/user/search/baltimore',
   parse: function(results) {
     return results.users;
+  },
+  comparator: function(user) {
+    return -user.get('followers_count');
   }
 });
 
@@ -35,10 +38,9 @@ App.UsersView = Backbone.View.extend({
     return this;
   }
 });
-    
 
-var allUsers = new App.UserCollection;
 $(document).ready(function() {
+  var allUsers = new App.UserCollection;
   var renderUsers = function(collection, response, options) {
     var usersView = new App.UsersView({collection: collection.models});
     usersView.render();
