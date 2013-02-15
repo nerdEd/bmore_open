@@ -1,49 +1,47 @@
-var App = Ember.Application.create();
-App.ApplicationController = Ember.Controller.extend({
-});
+var App = {};
+_.templateSettings = {interpolate :/\{\{(.+?)\}\}/g};
 
-App.Router.map(function() {
-  this.resource('users', function() {});
-});
-
-App.UsersRoute = Ember.Route.extend({
-  model: function() {
-    return App.User.find();
-  },
-  setupController: function(controller, model) {
-    controller.set('content', model);
+App.User = Backbone.Model.extend({
+  parse: function(resp, options) {
+    return _.omit(resp, ['id']);
   }
 });
 
-App.Store = DS.Store.extend({
-  revision: 11,
-  adapter: DS.RESTAdapter.create({
-    ajax: function(url, type, hash) {
-      // awful hack to override embers lovely defaults, blame github
-      hash.url = 'https://api.github.com/legacy/user/search/baltimore';
-      hash.type = type;
-      hash.dataType = 'json';
-      hash.contentType = 'application/json; charset=utf-8';
-      hash.context = this;
-
-      if (hash.data && type !== 'GET') {
-        hash.data = JSON.stringify(hash.data);
-      }
-
-      jQuery.ajax(hash);
-    }
-  })
+App.UserCollection = Backbone.Collection.extend({
+  model: App.User,
+  url: 'https://api.github.com/legacy/user/search/baltimore',
+  parse: function(results) {
+    return results.users;
+  }
 });
 
-var attr = DS.attr;
-App.User = DS.Model.extend({
-  created: attr('date'),
-  login: attr('string'),
-  location: attr('string'),
-  fullname: attr('string'),
-  username: attr('string'),
-  followersCount: attr('number'),
-  followers: attr('number'),
-  publicRepoCount: attr('number'),
-  repos: attr('number'),
+App.UserListingView = Backbone.View.extend({
+  tagName: 'li',
+  template: _.template($('#user_listing_template').html()),
+  render: function() {
+    this.$el.html(this.template(this.model.toJSON()));
+    return this;
+  }
+});
+
+App.UsersView = Backbone.View.extend({
+  id: 'users_list',
+  el: $('#users_list'),
+  render: function() {
+    _.each(this.collection, function(user) {
+      var userView = new App.UserListingView({model: user});
+      this.$el.append(userView.render().el);
+    }, this);
+    return this;
+  }
+});
+    
+
+var allUsers = new App.UserCollection;
+$(document).ready(function() {
+  var renderUsers = function(collection, response, options) {
+    var usersView = new App.UsersView({collection: collection.models});
+    usersView.render();
+  };
+  allUsers.fetch({success: renderUsers});
 });

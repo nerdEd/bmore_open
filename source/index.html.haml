@@ -1,20 +1,11 @@
-%script{type: 'text/x-handlebars', 'data-template-name' => 'application'}
-  {{outlet}}
+%h2 All Baltimore Github Users
+%ol#users_list
 
-%script{type: 'text/x-handlebars', 'data-template-name' => 'index'}
-  %h1 Hello
-  {{#linkTo 'users'}}Users{{/linkTo}}
-
-%script{type: 'text/x-handlebars', 'data-template-name' => 'users'}
-  %h2 All Baltimore Github Users {{controller.length}}
-  %ul.users
-    {{#each controller}}
-    %li 
-      %dl
-        %dt Username
-        %dd.username {{username}}
-        %dt Followers Count
-        %dd.followers_count {{followersCount}}
-        %dt Public Repo Count
-        %dd.public_repo_count {{publicRepoCount}}
-    {{/each}}
+#user_listing_template{style: 'display: none'}
+  %dl
+    %dt Username
+    %dd.username {{ username }}
+    %dt Followers Count
+    %dd.followers_count {{ followers_count }}
+    %dt Public Repo Count
+    %dd.public_repo_count {{ public_repo_count }}
